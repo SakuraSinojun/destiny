@@ -1,0 +1,83 @@
+
+
+CROSS := i586-mingw32msvc-
+CXX	:= $(CROSS)g++
+LD	:= $(CROSS)g++
+AR	:= $(CROSS)ar
+CXXFLAGS := -Wall -O2
+INCLUDES = -Ilog -I.
+
+TARGET	= a.exe
+READLOG = r.exe
+
+LINKS	= -L.
+LIBS	= -lgdi32 -luser32 -lws2_32 -luser32
+
+SOURCES := main.cc
+SOURCES += game.cc
+SOURCES += ui.cc
+SOURCES += gamemap.cc
+SOURCES += race.cc
+SOURCES += creature.cc
+SOURCES += hero.cc
+SOURCES += attr.cc
+SOURCES += class.cc
+SOURCES += dice.cc
+SOURCES += scene.cc
+SOURCES += scene_genhero.cc
+SOURCES += scene_game.cc
+SOURCES += ai.cc
+SOURCES += monster.cc
+SOURCES += wincurse.cc
+
+SOURCES += log/logging.cc
+SOURCES += log/log_dispatcher.cc
+SOURCES += log/logtracer_shell.cc
+SOURCES += log/logtracer_udp.cc
+
+SOURCES += tools/dump.cc
+SOURCES += tools/config.cc
+SOURCES += tools/string_util.cc
+SOURCES += tools/socket.cc
+
+
+OBJS := $(SOURCES:.cc=.o)
+DEPS := $(SOURCES:.cc=.d)
+
+all: prebuild $(TARGET)
+
+$(TARGET): $(OBJS)
+	@echo Linking $@ ...
+	$(LD) $(OBJS) $(LINKS) $(LIBS) -o$@
+	@echo -------------------------------------------
+	@echo done.
+
+$(READLOG): readlog.o tools/socket.o
+	@echo Linking $@ ...
+	$(LD) readlog.o tools/socket.o $(LINKS) $(LIBS) -o$@
+	@echo -------------------------------------------
+	@echo done.
+
+.cpp.o:
+	@echo Compling $@ ...
+	$(CXX) -c $< $(INCLUDES) $(CXXFLAGS)  -o $@
+	@echo -------------------------------------------
+
+.cc.o:
+	@echo Compling $@ ...
+	$(CXX) -c $< $(INCLUDES) $(CXXFLAGS)  -o $@
+	@echo ------------------------------------------
+
+%.d:%.cc
+	$(CXX) -MM $< $(INCLUDES) $(CXXFLAGS) -o $@
+
+prebuild:
+	#echo -------
+
+include $(DEPS)
+
+clean:
+	rm -fr $(OBJS) $(DEPS)
+
+
+
