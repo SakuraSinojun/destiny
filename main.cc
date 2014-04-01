@@ -9,8 +9,11 @@
 #include "game.h"
 #include "dice.h"
 
+#include <locale.h>
+
 int main()
 {
+    setlocale(LC_ALL, "");
     // logging::LogDispatcher::GetInstance()->AddTracer(new logging::LogTracerShell());
     logging::LogDispatcher::GetInstance()->AddTracer(new logging::LogTracerUdp());
     dice_init();

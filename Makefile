@@ -10,7 +10,7 @@ TARGET	= a.out
 READLOG = r.out
 
 LINKS	= -L.
-LIBS	= -lncurses
+LIBS	= -lncursesw
 
 SOURCES := main.cc
 SOURCES += game.cc

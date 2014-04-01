@@ -284,13 +284,13 @@ void UI::DrawInventory(int index, int highlight)
         m = (WINDOW*)NewWin("inventory", m_map_width + 0, 0, 27, m_map_height - 10);
 
     mvwprintw(m, 1, 1, "WEARING");
-    mvwprintw(m, 2, 1, "Í·:                      ");
-    mvwprintw(m, 3, 1, "ÐØ:                      ");
-    mvwprintw(m, 4, 1, "ÍÈ:                      ");
-    mvwprintw(m, 5, 1, "½Å:                      ");
-    mvwprintw(m, 6, 1, "¾±:                      ");
-    mvwprintw(m, 7, 1, "Ö¸:                      ");
-    mvwprintw(m, 8, 1, "ÊÖ:                      ");
+    mvwprintw(m, 2, 1, "å¤´:                      ");
+    mvwprintw(m, 3, 1, "èƒ¸:                      ");
+    mvwprintw(m, 4, 1, "è…¿:                      ");
+    mvwprintw(m, 5, 1, "è„š:                      ");
+    mvwprintw(m, 6, 1, "é¢ˆ:                      ");
+    mvwprintw(m, 7, 1, "æŒ‡:                      ");
+    mvwprintw(m, 8, 1, "æ‰‹:                      ");
     mvwhline(m, 9, 1, 0, 25);
 
     Hero* h = Hero::Get();
