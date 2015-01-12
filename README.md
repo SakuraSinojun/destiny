@@ -1,4 +1,0 @@
-destiny
-=======
-
-some roguelike
