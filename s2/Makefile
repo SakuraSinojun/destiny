@@ -13,6 +13,7 @@ LIBS	= -lncursesw -lpthread
 
 SOURCES := main.cpp
 SOURCES += tools/logging.cpp
+SOURCES += tools/dump.cpp
 
 OBJS := $(SOURCES:.cpp=.o)
 DEPS := $(SOURCES:.cpp=.d)
