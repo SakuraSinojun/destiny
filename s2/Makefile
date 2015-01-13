@@ -12,6 +12,11 @@ LINKS	= -L.
 LIBS	= -lncursesw -lpthread
 
 SOURCES := main.cpp
+SOURCES += ui.cpp
+SOURCES += game.cpp
+SOURCES += map.cpp
+SOURCES += overmap.cpp
+SOURCES += rng.cpp
 SOURCES += tools/logging.cpp
 SOURCES += tools/dump.cpp
 
