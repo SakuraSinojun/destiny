@@ -14,6 +14,8 @@
 
 #define MAPWIDTH    150
 #define MAPHEIGHT   40
+#define BLOCKSIZE   10
+#define ROADDEPTH   5
 
 class Road {
 public:
@@ -41,14 +43,14 @@ public:
             return false;
         int imin, imax, omin, omax;
         if (x1 == x0) {
-            if (abs(o.x0 - x0) > 5)
+            if (abs(o.x0 - x0) > BLOCKSIZE)
                 return false;
             imin = std::min(y0, y1);
             imax = std::max(y0, y1);
             omin = std::min(o.y0, o.y1);
             omax = std::max(o.y0, o.y1);
         } else {
-            if (abs(o.y0 - y0) > 5)
+            if (abs(o.y0 - y0) > BLOCKSIZE)
                 return false;
             imin = std::min(x0, x1);
             imax = std::max(x0, x1);
@@ -179,16 +181,16 @@ int main()
         dx = (dx > 0) ? 1 : (dx < 0) ? -1 : 0;
         dy = (dy > 0) ? 1 : (dy < 0) ? -1 : 0;
 
-        bool cross = length > 5 ? chance(20) : false;
+        bool cross = length > BLOCKSIZE ? chance(20) : false;
         bool Tjunction = chance(50);
         bool Tdirection = chance(50);
-        bool end = cross ? chance(road.weight * 6) : (length > 5 ? chance(road.weight * 5) : false);
+        bool end = cross ? chance(road.weight * 6) : (length > BLOCKSIZE ? chance(road.weight * 5) : false);
 
         if (dx == 0) {
             if (cross) {
                 Road r;
                 r.weight = road.weight + 1;
-                if (r.weight < 5) {
+                if (r.weight < ROADDEPTH) {
                     r.x0 = road.x1 + (Tdirection ? road.width : -1);
                     r.y0 = road.y1;
                     r.x1 = r.x0 + (Tdirection ? 1 : -1);
@@ -225,7 +227,7 @@ int main()
             if (cross) {
                 Road r;
                 r.weight = road.weight + 1;
-                if (r.weight < 5) {
+                if (r.weight < ROADDEPTH) {
                     r.x0 = road.x1;
                     r.y0 = road.y1 + (Tdirection ? road.width : -1);
                     r.x1 = r.x0;
