@@ -50,7 +50,7 @@ overmap::oter map::get_terrain(int x, int y, int z)
 
     // if (x == 5 && y == 5)
     //     return overmap::ot_rock;
-    return m->ter(terx, tery);
+    return m->ter(terx, tery, z);
     // return m->layer[z + OVERMAP_DEPTH].terrain[terx][tery];
 }
 

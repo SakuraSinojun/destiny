@@ -4,6 +4,20 @@
 #include "ui.h"
 #include "game.h"
 
+
+//      LINE_NESW  - X for on, O for off
+#define LINE_XOXO 4194424
+#define LINE_OXOX 4194417
+#define LINE_XXOO 4194413
+#define LINE_OXXO 4194412
+#define LINE_OOXX 4194411
+#define LINE_XOOX 4194410
+#define LINE_XXXO 4194420
+#define LINE_XXOX 4194422
+#define LINE_XOXX 4194421
+#define LINE_OXXX 4194423
+#define LINE_XXXX 4194414
+
 ui::ui()
 {
 }
@@ -51,18 +65,47 @@ int ui::run()
     int input = 0;
     int x = 0;
     int y = 0;
+    int z = 0;
     while (input != 'q') {
         for (int i = x - 50; i < x + 50; i++) {
             for (int j = y - 20; j < y + 20; j++) {
-                overmap::oter o = g.m().get_terrain(i, j);
+                overmap::oter o = g.m().get_terrain(i, j, z);
 
                 int cx = i - (x - 20);
                 int cy = j - (y - 20);
                 int ch = '.';
-                if (o == overmap::ot_river_center)
+                if (o.is_river())
                     ch = '~';
                 else if (o == overmap::ot_rock)
                     ch = '*';
+                else if (o == overmap::ot_road_ns)
+                    ch = LINE_XOXO;
+                else if (o == overmap::ot_road_ew)
+                    ch = LINE_OXOX;
+                else if (o == overmap::ot_road_ne)
+                    ch = LINE_XXOO;
+                else if (o == overmap::ot_road_es)
+                    ch = LINE_OXXO;
+                else if (o == overmap::ot_road_sw)
+                    ch = LINE_OOXX;
+                else if (o == overmap::ot_road_wn)
+                    ch = LINE_XOOX;
+                else if (o == overmap::ot_road_nes)
+                    ch = LINE_XXXO;
+                else if (o == overmap::ot_road_new)
+                    ch = LINE_XXOX;
+                else if (o == overmap::ot_road_nsw)
+                    ch = LINE_XOXX;
+                else if (o == overmap::ot_road_esw)
+                    ch = LINE_OXXX;
+                else if (o == overmap::ot_road_nesw)
+                    ch = LINE_XXXX;
+                else if (o == overmap::ot_shop)
+                    ch = 'S';
+                else if (o == overmap::ot_house)
+                    ch = 'H';
+                else if (o == overmap::ot_park)
+                    ch = '#';
                 else
                     ch = '.';
 
@@ -80,6 +123,10 @@ int ui::run()
             y++;
         if (input == 'k')
             y--;
+        if (input == '>')
+            z++;
+        if (input == '<')
+            z--;
     }
 
     uninit();

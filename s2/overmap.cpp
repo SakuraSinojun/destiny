@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <vector>
 
 #include "game.h"
@@ -162,6 +163,8 @@ void overmap::generate(overmap* north, overmap* west, overmap* south, overmap* e
         for (size_t i = 0; i < river_start.size(); i++)
             place_river(river_start[i], river_end[i]);
     }
+
+    place_cities();
 }
 
 overmap::oter& overmap::ter(int x, int y, int z)
@@ -222,6 +225,161 @@ void overmap::place_river(point pa, point pb)
     } while (pb.x != x || pb.y != y);
 }
 
+void overmap::place_cities()
+{
+    // 3d4 cities per overmap block.
+    size_t  num = OVERMAP_CITIES_PER_BLOCK(); // dice(3, 4);
+
+    int cx, cy, cs;
+    int start_dir;
+    while (cities.size() < num) {
+        cx = rng(12, OMAPX - 12);
+        cy = rng(12, OMAPY - 12);
+        cs = OVERMAP_CITY_SIZE(); // dice(3, 4);
+        if (ter(cx, cy) == ot_field) {
+            ter(cx, cy) = ot_road_nesw;
+            city tmp(cx, cy, cs);
+            cities.push_back(tmp);
+            start_dir = rng(0, 3);
+            for (int j = 0; j < 4; j++)
+                make_road(cx, cy, cs, (start_dir + j) % 4, tmp);
+        }
+    }
+}
+
+void overmap::make_road(int cx, int cy, int cs, int dir, city town)
+{
+    int x = cx, y = cy;
+    int c = cs, croad = cs;
+    switch (dir) {
+    case 0:
+        while (c > 0 && y > 0 && (ter(x, y - 1, 0) == ot_field || c == cs)) {
+            y--;
+            c--;
+            ter(x, y, 0) = ot_road_ns;
+            for (int i = -1; i <= 0; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    if (abs(j) != abs(i) && (ter(x + j, y + i, 0) == ot_road_ew || ter(x + j, y + i, 0) == ot_road_ns)) {
+                        ter(x, y, 0) = ot_road_null;
+                        c = -1;
+                    }
+                }
+            }
+            put_buildings(x, y, dir, town);
+            if (c < croad - 1 && c >= 2 && ter(x - 1, y, 0) == ot_field && ter(x + 1, y, 0) == ot_field) {
+                croad = c;
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 1, town);
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 3, town);
+            }
+        }
+        if (ter(x, y - 2, 0).is_road())
+            ter(x, y - 1, 0) = ot_road_ns;
+        break;
+    case 1:
+        while (c > 0 && x < OMAPX - 1 && (ter(x + 1, y, 0) == ot_field || c == cs)) {
+            x++;
+            c--;
+            ter(x, y, 0) = ot_road_ew;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = 0; j <= 1; j++) {
+                    if (abs(j) != abs(i) && (ter(x + j, y + i, 0) == ot_road_ew || ter(x + j, y + i, 0) == ot_road_ns)) {
+                        ter(x, y, 0) = ot_road_null;
+                        c = -1;
+                    }
+                }
+            }
+            put_buildings(x, y, dir, town);
+            if (c < croad - 2 && c >= 3 && ter(x, y - 1, 0) == ot_field && ter(x, y + 1, 0) == ot_field) {
+                croad = c;
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 0, town);
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 2, town);
+            }
+        }
+        if (ter(x - 2, y, 0).is_road())
+            ter(x - 1, y, 0) = ot_road_ew;
+        break;
+    case 2:
+        while (c > 0 && y < OMAPY-1 && (ter(x, y+1, 0) == ot_field || c == cs)) {
+            y++;
+            c--;
+            ter(x, y, 0) = ot_road_ns;
+            for (int i = 0; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    if (abs(j) != abs(i) && (ter(x+j, y+i, 0) == ot_road_ew ||
+                            ter(x+j, y+i, 0) == ot_road_ns)) {
+                        ter(x, y, 0) = ot_road_null;
+                        c = -1;
+                    }
+                }
+            }
+            put_buildings(x, y, dir, town);
+            if (c < croad - 2 && ter(x - 1, y, 0) == ot_field && ter(x + 1, y, 0) == ot_field) {
+                croad = c;
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 1, town);
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 3, town);
+            }
+        }
+        if (ter(x, y + 2, 0).is_road())
+            ter(x, y + 1, 0) = ot_road_ns;
+        break;
+    case 3:
+        while (c > 0 && x > 0 && (ter(x-1, y, 0) == ot_field || c == cs)) {
+            x--;
+            c--;
+            ter(x, y, 0) = ot_road_ew;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 0; j++) {
+                    if (abs(j) != abs(i) && (ter(x + j, y + i, 0) == ot_road_ew || ter(x + j, y + i, 0) == ot_road_ns)) {
+                        ter(x, y, 0) = ot_road_null;
+                        c = -1;
+                    }
+                }
+            }
+            put_buildings(x, y, dir, town);
+            if (c < croad - 2 && c >= 3 && ter(x, y - 1, 0) == ot_field && ter(x, y + 1, 0) == ot_field) {
+                croad = c;
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 0, town);
+                make_road(x, y, cs - OVERMAP_ROAD_LENGTH(), 2, town);
+            }
+        }
+        if (ter(x + 2, y, 0).is_road())
+            ter(x + 1, y, 0) = ot_road_ew;
+        break;
+    }
+    // return;
+    cs -= OVERMAP_ROAD_LENGTH();
+    if (cs >= 2 && c == 0) {
+        int dir2;
+        if (dir % 2 == 0)
+            dir2 = rng(0, 1) * 2 + 1;
+        else
+            dir2 = rng(0, 1) * 2;
+        make_road(x, y, cs, dir2, town);
+        if (one_in(5))
+            make_road(x, y, cs, (dir2 + 2) % 4, town);
+    }
+}
 
 
+double overmap::dist(int x1, int y1, int x2, int y2)
+{
+    return sqrt(double((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)));
+}
+
+void overmap::put_buildings(int x, int y, int dir, city town)
+{
+    int ychange = dir % 2, xchange = (dir + 1) % 2;
+    for (int i = -1; i <= 1; i += 2) {
+        if ((ter(x + i * xchange, y + i * ychange, 0) == ot_field) && !one_in(OVERMAP_STREET_CHANCE)) {
+            if (rng(0, 99) > 80 * dist(x, y, town.x, town.y) / town.s)
+                ter(x + i * xchange, y + i * ychange, 0) = ot_shop; // shop(((dir % 2) - i) % 4);
+            else {
+                if (rng(0, 99) > 130 * dist(x, y, town.x, town.y) / town.s)
+                    ter(x + i * xchange, y + i * ychange, 0) = ot_park;
+                else
+                    ter(x + i * xchange, y + i * ychange, 0) = ot_house; // house(((dir%2)-i)%4);
+            }
+        }
+    }
+}
 
