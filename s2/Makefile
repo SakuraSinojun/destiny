@@ -16,8 +16,9 @@ SOURCES += ui.cpp
 SOURCES += game.cpp
 SOURCES += map.cpp
 SOURCES += overmap.cpp
+SOURCES += submap.cpp
 SOURCES += rng.cpp
-# SOURCES += point.cpp
+SOURCES += point.cpp
 SOURCES += tools/logging.cpp
 SOURCES += tools/dump.cpp
 

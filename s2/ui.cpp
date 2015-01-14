@@ -69,10 +69,33 @@ int ui::run()
     while (input != 'q') {
         for (int i = x - 50; i <= x + 50; i++) {
             for (int j = y - 20; j <= y + 20; j++) {
-                overmap::oter o = g.m().get_terrain(i, j, z);
-
+                submap::ster s = g.m().get_ster(i, j, z);
                 int cx = i - (x - 50);
                 int cy = j - (y - 20);
+
+                int ch = '.';
+                if (s == submap::st_river)
+                    ch = '~';
+                else if (s == submap::st_road)
+                    ch = '#';
+                else if (s == submap::st_house)
+                    ch = 'H';
+                else if (s == submap::st_rock)
+                    ch = '*';
+                mvaddch(cy, cx, ch);
+            }
+        }
+        mvaddch(20, 50, '@');
+
+        // overmap
+        point smp = map::x2sm(point(x, y));
+        for (int i = smp.x - 10; i <= smp.x + 10; i++) {
+            for (int j = smp.y - 10; j <= smp.y + 10; j++) {
+                overmap::oter o = g.m().get_oter(i, j, z);
+
+                int cx = i - (smp.x - 10) + 100;
+                int cy = j - (smp.y - 10);
+
                 int ch = '.';
                 if (o.is_water())
                     ch = '~';
@@ -130,7 +153,9 @@ int ui::run()
                 mvaddch(cy, cx, ch);
             }
         }
-        mvaddch(20, 50, '@');
+        mvaddch(10, 110, '@');
+
+
 
         mvprintw(2, 102, "(%d, %d, %d)", x, y, z);
         refresh();

@@ -4,6 +4,8 @@
 #include <list>
 
 #include "overmap.h"
+#include "submap.h"
+#include "point.h"
 
 class game;
 class map
@@ -13,12 +15,21 @@ public:
     void load(const char * name);
 
     overmap* get_overmap(const int x, const int y, bool generate_if_not_exists = true);
-    void     add_overmap(overmap& over);
 
-    overmap::oter get_terrain(int x, int y, int z = 0);
+    submap::ster get_ster(int x, int y, int z = 0);
+    overmap::oter get_oter(int x, int y, int z = 0);
+
+    static point x2sm(const point& pt);
+    static point x2om(const point pt);
+    static point x2ster(const point& pt);
+    static point x2oter(const point& pt);
 
 private:
     std::list<overmap>  overmap_list;
+    std::list<submap>   submap_list;
+
     game&   m_game;
+
+    submap*  get_submap(const int x, const int y);
 };
 
