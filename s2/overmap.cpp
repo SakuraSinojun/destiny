@@ -698,6 +698,12 @@ void overmap::make_hiway(int x1, int y1, int x2, int y2, int z, oter_id base)
         } else if (!ot.is_road()) {
             ot = base;
         }
+
+        if (one_in(20)) {
+            put_buildings(x, y, hor ? 0 : 1, city(x, y, 5));
+            put_buildings(x, y, hor ? 2 : 3, city(x, y, 5));
+        }
+
     } // while
 }
 
