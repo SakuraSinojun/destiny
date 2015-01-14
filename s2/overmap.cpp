@@ -12,23 +12,44 @@
 overmap::overmap(game& g, int x, int y)
     : m_game(g)
     , loc(x, y)
+    , layer(NULL)
 {
     init_layers();
     load();
 }
 
+overmap::overmap(const overmap& o)
+    : m_game(o.m_game)
+    , loc(o.loc.x, o.loc.y)
+    , layer(NULL)
+{
+    layer = new map_layer[OVERMAP_LAYERS];
+    for(int z = 0; z < OVERMAP_LAYERS; ++z) {
+        for(int i = 0; i < OMAPX; ++i) {
+            for(int j = 0; j < OMAPY; ++j) {
+                layer[z].terrain[i][j] = o.layer[z].terrain[i][j];
+                // layer[z].visible[i][j] = o.layer[z].visible[i][j];
+            }
+        }
+        // layer[z].notes = o.layer[z].notes;
+    }
+}
+
 overmap::~overmap()
 {
+    if (layer != NULL)
+        delete[] layer;
 }
 
 void overmap::init_layers()
 {
+    layer = new map_layer[OVERMAP_LAYERS];
     for(int z = 0; z < OVERMAP_LAYERS; ++z) {
         oter_id default_type = (z < OVERMAP_DEPTH) ? ot_rock : (z == OVERMAP_DEPTH) ? ot_field : ot_null;
         for(int i = 0; i < OMAPX; ++i) {
             for(int j = 0; j < OMAPY; ++j) {
                 layer[z].terrain[i][j] = default_type;
-                layer[z].visible[i][j] = false;
+                // layer[z].visible[i][j] = false;
             }
         }
     }
@@ -53,6 +74,7 @@ void overmap::generate(overmap* north, overmap* west, overmap* south, overmap* e
     place_cities();
     generate_roads(north, west, south, east);
     place_forest();
+    polish(0);
 }
 
 void overmap::generate_rivers(overmap* north, overmap* west, overmap* south, overmap* east)
@@ -720,7 +742,6 @@ overmap::oter_id overmap::shop(int dir)
     return ot_shop;
 }
 
-#if 0
 void overmap::polish(int z, oter_id min, oter_id max)
 {
     for (int x = 0; x < OMAPX; x++) {
@@ -744,7 +765,6 @@ void overmap::polish(int z, oter_id min, oter_id max)
 
 void overmap::good_road(int x, int y, int z)
 {
-    return;
     oter& ot = ter(x, y, z);
 
     bool n = ter(x, y - 1, z).is_road();
@@ -784,7 +804,6 @@ void overmap::good_road(int x, int y, int z)
     //     ter(x, y, z) = ot_road_nesw_manhole;
 }
 
-#endif
 
 
 

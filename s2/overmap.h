@@ -91,10 +91,7 @@ public:
     public:
         oter_id type;
         int     level;
-        int     n;
-        int     s;
-        int     w;
-        int     e;
+        // bool    n, s, w, e;
 
         oter() : type(ot_null), level(0) {}
         oter(oter_id id) : type(id), level(0) {}
@@ -117,10 +114,11 @@ public:
     class map_layer {
     public:
         oter    terrain[OMAPX][OMAPY];
-        bool    visible[OMAPX][OMAPY];
+        // bool    visible[OMAPX][OMAPY];
     };
 
     overmap(game& g, int x, int y);
+    overmap(const overmap& o);
     virtual ~overmap();
 
     point& pos() { return loc; }
@@ -129,7 +127,8 @@ private:
     friend class map;
     game&       m_game;
     point       loc;
-    map_layer   layer[OVERMAP_LAYERS];
+    // map_layer   layer[OVERMAP_LAYERS];
+    map_layer*  layer;
     oter        nullret;
     std::vector<city> cities;
     std::vector<city> roads_out;
@@ -151,8 +150,8 @@ private:
     oter_id house(int dir);
     oter_id shop(int dir);
 
-    // void polish(int z, oter_id min = ot_null, oter_id max = ot_max);
-    // void good_road(int x, int y, int z);
+    void polish(int z, oter_id min = ot_null, oter_id max = ot_max);
+    void good_road(int x, int y, int z);
 
     double dist(int x1, int y1, int x2, int y2);
 
