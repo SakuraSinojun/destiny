@@ -93,6 +93,7 @@ public:
         bool is_road() { return type > ot_road_start && type <= ot_road_end; }
         bool is_bridge() { return type == ot_bridge_ns || type == ot_bridge_ew; }
         bool is_building() { return type > ot_building_start && type <= ot_building_end; }
+        bool is_forest() { return type >= ot_forest && type <= ot_forest_water; }
     };
 
 

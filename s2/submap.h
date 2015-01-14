@@ -5,14 +5,25 @@
 #include "point.h"
 #include "mapdef.h"
 
-class overmap;
+class map;
 class submap
 {
 public:
     typedef enum {
         st_null = 0,
-        st_rock,
+
+        st_dirt,
+        st_grass,
+
+        st_shrub,
+        st_shrub_blueberry,
+        st_shrub_strawberry,
+
+        st_tree, st_tree_young, st_tree_apple,
+
         st_field,
+
+        st_rock,
         st_river,
         st_road,
         st_house,
@@ -36,7 +47,7 @@ public:
         ster    terrain[SMAPX][SMAPY];
     };
 
-    submap(overmap* om, int x, int y);
+    submap(map* mp, int x, int y);
     ~submap();
 
     point& pos() { return loc; }
@@ -46,10 +57,11 @@ public:
 private:
     map_layer   layer[OVERMAP_LAYERS];
     point       loc;
-    const int   otx;
-    const int   oty;
     ster        nullret;
 
-    void generate(overmap* om);
+    void generate(map* mp);
+    void gen_full(ster_id id);
+    void gen_field();
+    void gen_forest(map* mp);
 };
 

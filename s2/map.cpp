@@ -41,10 +41,10 @@ submap* map::get_submap(const int x, const int y)
         }
     }
 
-    point   op = x2om(point(x, y));
-    overmap* om = get_overmap(op.x, op.y);
+    // point   op = x2om(point(x, y));
+    // overmap* om = get_overmap(op.x, op.y);
 
-    submap  new_submap(om, x, y);
+    submap  new_submap(this, x, y);
     submap_list.push_back(new_submap);
     return &submap_list.back();
 }

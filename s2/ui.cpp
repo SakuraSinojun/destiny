@@ -82,6 +82,18 @@ int ui::run()
                     ch = 'H';
                 else if (s == submap::st_rock)
                     ch = '*';
+                else if (s == submap::st_dirt)
+                    ch = '.';
+                else if (s == submap::st_grass)
+                    ch = ',';
+                else if (s >= submap::st_shrub && s <= submap::st_shrub_strawberry)
+                    ch = '#';
+                else if (s == submap::st_tree)
+                    ch = 'T';
+                else if (s == submap::st_tree_young)
+                    ch = 't';
+                else if (s == submap::st_tree_apple)
+                    ch = 'A';
                 mvaddch(cy, cx, ch);
             }
         }
