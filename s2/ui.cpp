@@ -67,14 +67,14 @@ int ui::run()
     int y = 0;
     int z = 0;
     while (input != 'q') {
-        for (int i = x - 50; i < x + 50; i++) {
-            for (int j = y - 20; j < y + 20; j++) {
+        for (int i = x - 50; i <= x + 50; i++) {
+            for (int j = y - 20; j <= y + 20; j++) {
                 overmap::oter o = g.m().get_terrain(i, j, z);
 
-                int cx = i - (x - 20);
+                int cx = i - (x - 50);
                 int cy = j - (y - 20);
                 int ch = '.';
-                if (o.is_river())
+                if (o.is_water())
                     ch = '~';
                 else if (o == overmap::ot_rock)
                     ch = '*';
@@ -100,19 +100,40 @@ int ui::run()
                     ch = LINE_OXXX;
                 else if (o == overmap::ot_road_nesw)
                     ch = LINE_XXXX;
+                else if (o == overmap::ot_road_null)
+                    ch = '#';
+                else if (o == overmap::ot_bridge_ns)
+                    ch = LINE_XOXO;
+                else if (o == overmap::ot_bridge_ew)
+                    ch = LINE_OXOX;
                 else if (o == overmap::ot_shop)
                     ch = 'S';
-                else if (o == overmap::ot_house)
-                    ch = 'H';
+                else if (o == overmap::ot_house_north)
+                    ch = '^';
+                else if (o == overmap::ot_house_south)
+                    ch = 'v';
+                else if (o == overmap::ot_house_west)
+                    ch = '<';
+                else if (o == overmap::ot_house_east)
+                    ch = '>';
                 else if (o == overmap::ot_park)
                     ch = '#';
+                else if (o == overmap::ot_forest)
+                    ch = 'f';
+                else if (o == overmap::ot_forest_thick)
+                    ch = 'F';
+                else if (o == overmap::ot_forest_water)
+                    ch = 'R';
                 else
                     ch = '.';
 
                 mvaddch(cy, cx, ch);
             }
         }
-        mvaddch(21, 21, '@');
+        mvaddch(20, 50, '@');
+
+        mvprintw(2, 102, "(%d, %d, %d)", x, y, z);
+        refresh();
 
         input = get_input();
         if (input == 'h')
@@ -141,7 +162,7 @@ void ui::init()
     // raw();
     keypad(stdscr, true);
     curs_set(false);
-    start_color();
+    // start_color();
 }
 
 void ui::uninit()
