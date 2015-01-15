@@ -82,18 +82,40 @@ void submap::gen_forest(map* mp)
     overmap::oter e = mp->get_oter(loc.x + 1, loc.y);
     overmap::oter t = mp->get_oter(loc.x, loc.y);
 
-    int chance = 10;
-    chance += (t == overmap::ot_forest) ? 0 : ((t == overmap::ot_forest_thick) ? 8 : 4);
-    chance += (n == overmap::ot_forest) ? 0 : ((n == overmap::ot_forest_thick) ? 8 : 4);
-    chance += (s == overmap::ot_forest) ? 0 : ((s == overmap::ot_forest_thick) ? 8 : 4);
-    chance += (w == overmap::ot_forest) ? 0 : ((w == overmap::ot_forest_thick) ? 8 : 4);
-    chance += (e == overmap::ot_forest) ? 0 : ((e == overmap::ot_forest_thick) ? 8 : 4);
-    chance *= 100;
-    // 20, 60, 100
+    int cht = (t == overmap::ot_forest_thick) ? 8 : ((t == overmap::ot_forest_water) ? 4 : 0);
+    int chn = cht + ((n == overmap::ot_forest_thick) ? 18 : ((n == overmap::ot_forest || n == overmap::ot_forest_water) ? 14 : 0));
+    int chs = cht + ((s == overmap::ot_forest_thick) ? 18 : ((s == overmap::ot_forest || s == overmap::ot_forest_water) ? 14 : 0));
+    int chw = cht + ((w == overmap::ot_forest_thick) ? 18 : ((w == overmap::ot_forest || w == overmap::ot_forest_water) ? 14 : 0));
+    int che = cht + ((e == overmap::ot_forest_thick) ? 18 : ((e == overmap::ot_forest || e == overmap::ot_forest_water) ? 14 : 0));
     
+    // 以SMAPX SMAPY都是12为基础做的概率。
     for (int j = 0; j < SMAPY; j++) {
         for (int i = 0; i < SMAPX; i++) {
             ster& st = ter(i, j);
+            int chance = 0;
+            int count = 0;
+            
+            if (chw > i) {
+                count++;
+                chance += chw - i;
+            }
+            if (chn > j) {
+                count++;
+                chance += chn - j;
+            }
+            if (che > (SMAPX - i - 1)) {
+                chance += che - (SMAPX - i - 1);
+                count++;
+            }
+
+            if (chs > (SMAPY - j - 1)) {
+                chance += chs - (SMAPY - j - 1);
+                count++;
+            }
+            if (count > 0) {
+                chance /= count;
+            }
+
             int rn = rng(0, chance);
             if (rn >= 13) {
                 st = one_in(200) ? st_tree_apple : st_tree;
