@@ -63,8 +63,8 @@ int ui::run()
     g.load("test");
 
     int input = 0;
-    int x = 0;
-    int y = 0;
+    int x = -477;
+    int y = -49;
     int z = 0;
     while (input != 'q') {
         for (int i = x - 50; i <= x + 50; i++) {
@@ -73,8 +73,12 @@ int ui::run()
                 int cx = i - (x - 50);
                 int cy = j - (y - 20);
 
-                int ch = '.';
+                int ch = ' ';
                 if (s == submap::st_river)
+                    ch = '~';
+                else if (s == submap::st_water_sh)
+                    ch = '-';
+                else if (s == submap::st_water_dp)
                     ch = '~';
                 else if (s == submap::st_road)
                     ch = '#';
@@ -83,7 +87,7 @@ int ui::run()
                 else if (s == submap::st_rock)
                     ch = '*';
                 else if (s == submap::st_dirt)
-                    ch = '.';
+                    ch = ' ';
                 else if (s == submap::st_grass)
                     ch = ',';
                 else if (s >= submap::st_shrub && s <= submap::st_shrub_strawberry)
@@ -109,7 +113,9 @@ int ui::run()
                 int cy = j - (smp.y - 10);
 
                 int ch = '.';
-                if (o.is_water())
+                if (o == overmap::ot_forest_water)
+                    ch = 'R';
+                else if (o.is_water())
                     ch = '~';
                 else if (o == overmap::ot_rock)
                     ch = '*';
@@ -157,8 +163,6 @@ int ui::run()
                     ch = 'f';
                 else if (o == overmap::ot_forest_thick)
                     ch = 'F';
-                else if (o == overmap::ot_forest_water)
-                    ch = 'R';
                 else
                     ch = '.';
 
@@ -169,7 +173,10 @@ int ui::run()
 
 
 
-        mvprintw(2, 102, "(%d, %d, %d)", x, y, z);
+        mvprintw(42, 102, "(%d, %d, %d)", x, y, z);
+        point pt(x, y);
+        pt = map::x2sm(pt);
+        mvprintw(42, 0, "s: %d, o: %d         ", g.m().get_ster(x, y, z).type, g.m().get_oter(pt.x, pt.y, z).type);
         refresh();
 
         input = get_input();

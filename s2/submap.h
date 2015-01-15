@@ -21,6 +21,9 @@ public:
 
         st_tree, st_tree_young, st_tree_apple,
 
+        st_water_sh,
+        st_water_dp,
+
         st_field,
 
         st_rock,
@@ -34,6 +37,7 @@ public:
         ster_id type;
         ster() : type(st_null) {}
         ster(ster_id id) : type(id) {}
+        ster& operator=(const ster& o) { type = o.type; return *this; }
         ster& operator=(ster_id id) { type = id; return *this; }
         bool operator==(ster_id t) { return (type == t); }
         bool operator<(ster_id t) { return (type < t); }
@@ -63,5 +67,7 @@ private:
     void gen_full(ster_id id);
     void gen_field();
     void gen_forest(map* mp);
+
+    void rotate(int turns, int z = 0);
 };
 

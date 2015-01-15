@@ -763,6 +763,8 @@ void overmap::polish(int z, oter_id min, oter_id max)
                 ot = ot_road_ns;
             } else if (ot == ot_bridge_ew && (!ter(x, y - 1, z).is_river() || !ter(x, y + 1, z).is_river())) {
                 ot = ot_road_ew;
+            } else if (ot > ot_river_start && ot < ot_river_end) {
+                good_river(x, y, z);
             } else {
             }
         }
@@ -808,6 +810,67 @@ void overmap::good_road(int x, int y, int z)
     }
     // if (ter(x, y, z) == ot_road_nesw && one_in(4))
     //     ter(x, y, z) = ot_road_nesw_manhole;
+}
+
+void overmap::good_river(int x, int y, int z)
+{
+    oter& ot = ter(x, y, z);
+
+    bool w = ter(x - 1, y, z).is_river();
+    bool e = ter(x + 1, y, z).is_river();
+    bool n = ter(x, y - 1, z).is_river();
+    bool s = ter(x, y + 1, z).is_river();
+
+    bool nw = ter(x - 1, y - 1, z).is_river();
+    bool ne = ter(x + 1, y - 1, z).is_river();
+    bool sw = ter(x - 1, y + 1, z).is_river();
+    bool se = ter(x + 1, y + 1, z).is_river();
+
+    if (w) {
+        if (n) {
+            if (s) {
+                if (e) {
+                    if (!nw)
+                        ot = ot_river_c_not_nw;
+                    else if (!ne)
+                        ot = ot_river_c_not_ne;
+                    else if (!sw)
+                        ot = ot_river_c_not_sw;
+                    else if (!se)
+                        ot = ot_river_c_not_se;
+                    else
+                        ot = ot_river_center;
+                } else {
+                    ot = ot_river_east;
+                }
+            } else {
+                ot = e ? ot_river_south : ot_river_se;
+            }
+        } else {
+            if (s) {
+                ot = e ? ot_river_north : ot_river_ne;
+            } else {
+                if (e) {
+                    ot = ot_forest_water;
+                }
+            }
+        }
+    } else {
+        if (n) {
+            if (s) {
+                ot = e ? ot_river_west : ot_forest_water;
+            } else {
+                ot = e ? ot_river_sw : ot_forest_water;
+            }
+        } else {
+            if (s) {
+                ot = e ? ot_river_nw : ot_forest_water;
+            } else {
+                ot = ot_forest_water;
+            }
+        }
+    }
+
 }
 
 

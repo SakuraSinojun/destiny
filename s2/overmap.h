@@ -81,6 +81,7 @@ public:
         oter() : type(ot_null), level(0) {}
         oter(oter_id id) : type(id), level(0) {}
         oter& operator=(oter_id t) { type = t; return *this; }
+        oter& operator=(const oter& o) { type = o.type; return *this; }
 
         bool operator==(oter_id t) { return (type == t); }
         bool operator<(oter_id t) { return (type < t); }
@@ -89,7 +90,7 @@ public:
         bool operator>(oter_id t) { return !operator<=(t); }
 
         bool is_river() { return (type > ot_river_start && type <= ot_river_end) || type == ot_bridge_ns || type == ot_bridge_ew; }
-        bool is_water() { return (type > ot_river_start && type <= ot_river_end); }
+        bool is_water() { return (type > ot_river_start && type <= ot_river_end) || type == ot_forest_water; }
         bool is_road() { return type > ot_road_start && type <= ot_road_end; }
         bool is_bridge() { return type == ot_bridge_ns || type == ot_bridge_ew; }
         bool is_building() { return type > ot_building_start && type <= ot_building_end; }
@@ -139,6 +140,7 @@ private:
 
     void polish(int z, oter_id min = ot_null, oter_id max = ot_max);
     void good_road(int x, int y, int z);
+    void good_river(int x, int y, int z);
 
     double dist(int x1, int y1, int x2, int y2);
 
