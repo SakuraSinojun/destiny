@@ -24,6 +24,10 @@ public:
     static point x2ster(const point& pt);
     static point x2oter(const point& pt);
 
+
+    int get_overmap_list_size() { return overmap_list.size(); }
+    int get_submap_list_size() { return submap_list.size(); }
+
 private:
     std::list<overmap>  overmap_list;
     std::list<submap>   submap_list;

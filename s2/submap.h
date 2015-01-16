@@ -4,6 +4,7 @@
 
 #include "point.h"
 #include "mapdef.h"
+#include "overmap.h"
 
 class map;
 class submap
@@ -65,8 +66,10 @@ private:
 
     void generate(map* mp);
     void gen_full(ster_id id);
-    void gen_field();
-    void gen_forest(map* mp);
+
+    bool gen_field(const overmap::oter& oter, map* mp);
+    bool gen_forest(const overmap::oter& oter, map* mp);
+    bool gen_river(const overmap::oter& oter, map* mp);
 
     void rotate(int turns, int z = 0);
 };

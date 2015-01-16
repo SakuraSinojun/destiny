@@ -27,111 +27,17 @@ submap::ster& submap::ter(int x, int y, int z)
 void submap::generate(map* mp)
 {
     overmap::oter oter = mp->get_oter(loc.x, loc.y); // om->ter(otx, oty);
-    // ster_id id = st_null;
-    switch (oter.type) {
-    case overmap::ot_null:
-        gen_full(st_null);
-        break;
-    case overmap::ot_field:
-        gen_full(st_field);
-        break;
-    case overmap::ot_rock:
-        break;
-    case overmap::ot_river_center:
-        gen_full(st_water_dp);
-        break;
-    case overmap::ot_river_c_not_ne:
-    case overmap::ot_river_c_not_nw:
-    case overmap::ot_river_c_not_se:
-    case overmap::ot_river_c_not_sw:
-        for (int x = SMAPX - 1; x >= 0; x--) {
-            for (int y = 0; y < SMAPY; y++) {
-                if (y < 4 && x >= SMAPX - 4)
-                    ter(x, y) = st_water_sh;
-                else
-                    ter(x, y) = st_water_dp;
-            }
-        }
-        if (oter.type == overmap::ot_river_c_not_se)
-            rotate(1);
-        if (oter.type == overmap::ot_river_c_not_sw)
-            rotate(2);
-        if (oter.type == overmap::ot_river_c_not_nw)
-            rotate(3);
-        break;
-    case overmap::ot_river_north:
-    case overmap::ot_river_east:
-    case overmap::ot_river_south:
-    case overmap::ot_river_west:
-        for (int i = 0; i < SMAPX; i++) {
-            for (int j = 0; j < SMAPY; j++) {
-                if (j < 4)
-                    ter(i, j) = st_water_sh;
-                else
-                    ter(i, j) = st_water_dp;
-            }
-        }
-        if (oter == overmap::ot_river_east)
-            rotate(1);
-        if (oter == overmap:: ot_river_south)
-            rotate(2);
-        if (oter == overmap::ot_river_west)
-            rotate(3);
-        break;
-    case overmap::ot_river_ne:
-    case overmap::ot_river_se:
-    case overmap::ot_river_sw:
-    case overmap::ot_river_nw:
-        for (int i = SMAPX - 1; i >= 0; i--) {
-            for (int j = 0; j < SMAPY; j++) {
-                if (i >= SMAPX - 3 && j < 3)
-                    ter(i, j) = st_dirt;
-                else if (i >= SMAPX - 4 || j < 4)
-                    ter(i, j) = st_water_sh;
-                else
-                    ter(i, j) = st_water_dp;
-            }
-        }
-        if (oter == overmap::ot_river_se)
-            rotate(1);
-        if (oter == overmap::ot_river_sw)
-            rotate(2);
-        if (oter == overmap::ot_river_nw)
-            rotate(3);
-        break;
-    case overmap::ot_road_null:
-    case overmap::ot_road_ns:
-    case overmap::ot_road_ew:
-    case overmap::ot_road_ne:
-    case overmap::ot_road_es:
-    case overmap::ot_road_sw:
-    case overmap::ot_road_wn:
-    case overmap::ot_road_nes:
-    case overmap::ot_road_new:
-    case overmap::ot_road_nsw:
-    case overmap::ot_road_esw:
-    case overmap::ot_road_nesw:
-    case overmap::ot_bridge_ns:
-    case overmap::ot_bridge_ew:
-        gen_full(st_road);
-        break;
-    case overmap::ot_house_north:
-    case overmap::ot_house_east:
-    case overmap::ot_house_west:
-    case overmap::ot_house_south:
-        gen_full(st_house);
-        break;
-    case overmap::ot_forest:
-    case overmap::ot_forest_thick:
-    case overmap::ot_forest_water:
-        gen_forest(mp);
-    default:
-        break;
-    }
+    if (gen_forest(oter, mp)) return;
+    if (gen_field(oter, mp)) return;
+    if (gen_river(oter, mp)) return;
+
+    // rock
+    // road
+    // house
 }
 
 void submap::rotate(int turns, int z)
-{
+{/*{{{*/
     while (turns < 0) {
         turns += 4;
     }
@@ -169,7 +75,7 @@ void submap::rotate(int turns, int z)
             ter(x, y, z) = rotated.terrain[x][y];
         }
     }
-}
+}/*}}}*/
 
 void submap::gen_full(ster_id id)
 {
@@ -180,8 +86,11 @@ void submap::gen_full(ster_id id)
     }
 }
 
-void submap::gen_field()
-{
+bool submap::gen_field(const overmap::oter& oter, map* mp)
+{/*{{{*/
+    if (oter != overmap::ot_field && oter != overmap::ot_null)
+        return false;
+
     for (int j = 0; j < SMAPY; j++) {
         for (int i = 0; i < SMAPX; i++) {
             ster& st = ter(i, j);
@@ -198,10 +107,15 @@ void submap::gen_field()
             }
         }
     }
-}
+    return true;
+}/*}}}*/
 
-void submap::gen_forest(map* mp)
-{
+bool submap::gen_forest(const overmap::oter& oter, map* mp)
+{/*{{{*/
+    if (oter != overmap::ot_forest && oter != overmap::ot_forest_thick && oter != overmap::ot_forest_water) {
+        return false;
+    }
+
     overmap::oter n = mp->get_oter(loc.x, loc.y - 1);
     overmap::oter s = mp->get_oter(loc.x, loc.y + 1);
     overmap::oter w = mp->get_oter(loc.x - 1, loc.y);
@@ -252,8 +166,78 @@ void submap::gen_forest(map* mp)
             }
         }
     }
-}
+    return true;
+}/*}}}*/
 
+bool submap::gen_river(const overmap::oter& oter, map* mp)
+{/*{{{*/
+    switch (oter.type) {
+    case overmap::ot_river_center:
+        gen_full(st_water_dp);
+        break;
+    case overmap::ot_river_c_not_ne:
+    case overmap::ot_river_c_not_nw:
+    case overmap::ot_river_c_not_se:
+    case overmap::ot_river_c_not_sw:
+        for (int x = SMAPX - 1; x >= 0; x--) {
+            for (int y = 0; y < SMAPY; y++) {
+                if (y < 4 && x >= SMAPX - 4)
+                    ter(x, y) = st_water_sh;
+                else
+                    ter(x, y) = st_water_dp;
+            }
+        }
+        if (oter.type == overmap::ot_river_c_not_se)
+            rotate(1);
+        if (oter.type == overmap::ot_river_c_not_sw)
+            rotate(2);
+        if (oter.type == overmap::ot_river_c_not_nw)
+            rotate(3);
+        break;
+    case overmap::ot_river_north:
+    case overmap::ot_river_east:
+    case overmap::ot_river_south:
+    case overmap::ot_river_west:
+        for (int i = 0; i < SMAPX; i++) {
+            for (int j = 0; j < SMAPY; j++) {
+                if (j < 4)
+                    ter(i, j) = st_water_sh;
+                else
+                    ter(i, j) = st_water_dp;
+            }
+        }
+        if (oter == overmap::ot_river_east)
+            rotate(1);
+        if (oter == overmap:: ot_river_south)
+            rotate(2);
+        if (oter == overmap::ot_river_west)
+            rotate(3);
+        break;
+    case overmap::ot_river_ne:
+    case overmap::ot_river_se:
+    case overmap::ot_river_sw:
+    case overmap::ot_river_nw:
+        for (int i = SMAPX - 1; i >= 0; i--) {
+            for (int j = 0; j < SMAPY; j++) {
+                if (i >= SMAPX - 4 || j < 4)
+                    ter(i, j) = st_water_sh;
+                else
+                    ter(i, j) = st_water_dp;
+            }
+        }
+        if (oter == overmap::ot_river_se)
+            rotate(1);
+        if (oter == overmap::ot_river_sw)
+            rotate(2);
+        if (oter == overmap::ot_river_nw)
+            rotate(3);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return true;
+}/*}}}*/
 
 
 

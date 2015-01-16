@@ -19,8 +19,8 @@
 #define OVERMAP_TOP_HIWAY_DIST      999
 
 
-#define SMAPX   12
-#define SMAPY   12
+#define SMAPX   24
+#define SMAPY   24
 
 
 

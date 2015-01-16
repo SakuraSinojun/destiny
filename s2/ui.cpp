@@ -63,8 +63,8 @@ int ui::run()
     g.load("test");
 
     int input = 0;
-    int x = -477;
-    int y = -49;
+    int x = 0;
+    int y = 0;
     int z = 0;
     while (input != 'q') {
         for (int i = x - 50; i <= x + 50; i++) {
@@ -87,7 +87,7 @@ int ui::run()
                 else if (s == submap::st_rock)
                     ch = '*';
                 else if (s == submap::st_dirt)
-                    ch = ' ';
+                    ch = '.';
                 else if (s == submap::st_grass)
                     ch = ',';
                 else if (s >= submap::st_shrub && s <= submap::st_shrub_strawberry)
@@ -172,11 +172,15 @@ int ui::run()
         mvaddch(10, 110, '@');
 
 
-
         mvprintw(42, 102, "(%d, %d, %d)", x, y, z);
+
         point pt(x, y);
         pt = map::x2sm(pt);
-        mvprintw(42, 0, "s: %d, o: %d         ", g.m().get_ster(x, y, z).type, g.m().get_oter(pt.x, pt.y, z).type);
+        mvprintw(42, 0, "s: %d o: %d | s: %d o: %d", 
+            g.m().get_ster(x, y, z).type, g.m().get_oter(pt.x, pt.y, z).type,
+            g.m().get_submap_list_size(), g.m().get_overmap_list_size()
+            );
+
         refresh();
 
         input = get_input();

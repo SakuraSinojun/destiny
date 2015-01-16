@@ -27,15 +27,26 @@ public:
         ot_rock,
 
         /////////////////////////////////////////////
-        ot_river_start,
+        ot_river_start,     // 4
         ot_river_center,
-        ot_river_c_not_ne, ot_river_c_not_nw, ot_river_c_not_se, ot_river_c_not_sw,
-        ot_river_north, ot_river_east, ot_river_south, ot_river_west,
-        ot_river_ne, ot_river_se, ot_river_sw, ot_river_nw,
+        ot_river_c_not_ne, 
+        ot_river_c_not_nw,
+        ot_river_c_not_se,
+        ot_river_c_not_sw,
+        ot_river_north,     // 10
+        ot_river_east,
+        ot_river_south,
+        ot_river_west,
+        ot_river_ne,
+        ot_river_se,
+        ot_river_sw, 
+        ot_river_nw,
         ot_river_end,
 
 
-        ot_forest, ot_forest_thick, ot_forest_water,
+        ot_forest,
+        ot_forest_thick,    // 20
+        ot_forest_water,
 
         /////////////////////////////////////////////
         ot_road_start,
@@ -83,11 +94,12 @@ public:
         oter& operator=(oter_id t) { type = t; return *this; }
         oter& operator=(const oter& o) { type = o.type; return *this; }
 
-        bool operator==(oter_id t) { return (type == t); }
-        bool operator<(oter_id t) { return (type < t); }
-        bool operator>=(oter_id t) { return !operator<(t); }
-        bool operator<=(oter_id t) { return operator<(t) || operator==(t); }
-        bool operator>(oter_id t) { return !operator<=(t); }
+        bool operator==(oter_id t) const { return (type == t); }
+        bool operator!=(oter_id t) const { return !operator==(t); }
+        bool operator<(oter_id t) const { return (type < t); }
+        bool operator>=(oter_id t) const { return !operator<(t); }
+        bool operator<=(oter_id t) const { return operator<(t) || operator==(t); }
+        bool operator>(oter_id t) const { return !operator<=(t); }
 
         bool is_river() { return (type > ot_river_start && type <= ot_river_end) || type == ot_bridge_ns || type == ot_bridge_ew; }
         bool is_water() { return (type > ot_river_start && type <= ot_river_end) || type == ot_forest_water; }
