@@ -29,6 +29,8 @@ submap::ster& submap::ter(int x, int y, int z)
 void submap::generate(map* mp)
 {
     overmap::oter oter = mp->get_oter(loc.x, loc.y); // om->ter(otx, oty);
+
+    srand(loc.x * 65536 + loc.y);
     if (gen_forest(oter, mp)) return;
     if (gen_field(oter, mp)) return;
     if (gen_river(oter, mp)) return;
@@ -78,6 +80,19 @@ void submap::rotate(int turns, int z)
             ter(x, y, z) = rotated.terrain[x][y];
         }
     }
+
+    if (turns == 1 || turns == 3) {
+        for (int x = 0; x < SMAPX; x++) {
+            for (int y = 0; y < SMAPY; y++) {
+                ster& st = ter(x, y, z);
+                if (st == st_wall_h)
+                    st = st_wall_v;
+                else if (st == st_wall_v)
+                    st = st_wall_h;
+            }
+        }
+    }
+
 }/*}}}*/
 
 void submap::gen_full(ster_id id)
@@ -355,8 +370,155 @@ bool submap::gen_road(const overmap::oter& oter, map* mp)
 
 bool submap::gen_house(const overmap::oter& oter, map* mp)
 {
-    return false;
+    RUN_HERE() << "oter = " << oter.type;
+    if (oter != overmap::ot_house_north 
+        && oter != overmap::ot_house_east
+        && oter != overmap::ot_house_south
+        && oter != overmap::ot_house_west) {
+        return false;
+    }
+    RUN_HERE();
+
+    int lw = rng(0, 4);         // West external wall
+    int mw = lw + rng(7, 10);   // Middle wall between bedroom & kitchen/bath
+    int rw = SMAPX - rng(1, 5); // East external wall
+    int tw = rng(1, 6);         // North external wall
+    int bw = SMAPY - rng(2, 5);	// South external wall
+    int cw = tw + rng(4, 7);    // Middle wall between living room & kitchen/bed
+
+    // ster_id wh = (oter == overmap::ot_house_north || oter == overmap::ot_house_south) ? st_wall_h : st_wall_v;
+    // ster_id wv = (oter == overmap::ot_house_north || oter == overmap::ot_house_south) ? st_wall_v : st_wall_h;
+
+    for (int i = 0; i < SMAPX; i++) {
+        for (int j = 0; j < SMAPY; j++) {
+            if (i > lw && i < rw && j > tw && j < bw)
+                ter(i, j) = st_floor;
+            else
+                ter(i, j) = grass_or_dirt();
+            if (i >= lw && i <= rw && (j == tw || j == bw))
+                ter(i, j) = st_wall_h;
+            if ((i == lw || i == rw) && j > tw && j < bw)
+                ter(i, j) = st_wall_v;
+        }
+    }
+
+
+    mw = rng(lw + 5, rw - 5);
+    cw = tw + rng(4, 7);
+    make_house_room(mw, tw, rw, cw);
+    make_house_room(lw, tw, mw, cw);
+    ter(mw, rng(tw + 2, cw - 2)) = (one_in(3) ? st_door_c : st_floor);
+
+    int rn = rng(lw + 1, cw - 2);
+    ter(rn    , tw) = st_window;
+    ter(rn + 1, tw) = st_window;
+    rn = rng(cw + 1, rw - 2);
+    ter(rn    , tw) = st_window;
+    ter(rn + 1, tw) = st_window;
+    mw = rng(lw + 3, rw - 3);
+    if (mw <= lw + 5) { // Bedroom on right, bathroom on left
+        rn = rng(cw + 2, rw - 2);
+        if (bw - cw >= 10 && mw - lw >= 6) {
+            make_house_room(lw, bw - 5, mw, bw);
+            make_house_room(lw, cw, mw, bw - 5);
+            ter(mw - 1, cw) = st_door_c;
+        } else {
+            if (bw - cw > 4) {	// Too big for a bathroom, not big enough for 2nd bedrm
+                make_house_room(lw, bw - 4, mw, bw);
+                for (int i = lw + 1; i <= mw - 1; i++)
+                    ter(i, cw) = st_floor;
+            } else
+                make_house_room(lw, cw, mw, bw);
+        }
+        make_house_room(mw, cw, rw, bw);
+        ter(mw, rng(bw - 4, bw - 1)) = st_door_c;
+    } else {    // Bedroom on left, bathroom on right
+        rn = rng(lw + 2, cw - 2);
+        if (bw - cw >= 10 && rw - mw >= 6) {
+            make_house_room(mw, bw - 5, rw, bw);
+            make_house_room(mw, cw, rw, bw - 5);
+            ter(rw - 1, cw) = st_door_c;
+        } else {
+            if (bw - cw > 4) {	// Too big for a bathroom, not big enough for 2nd bedrm
+                make_house_room(mw, bw - 4, rw, bw);
+                for (int i = mw + 1; i <= rw - 1; i++)
+                    ter(i, cw) = st_floor;
+            } else {
+                make_house_room(mw, cw, rw, bw);
+            }
+        }
+        make_house_room(lw, cw, mw, bw);
+        ter(mw, rng(bw - 4, bw - 1)) = st_door_c;
+    }
+    ter(rn    , bw) = st_window;
+    ter(rn + 1, bw) = st_window;
+    if (!one_in(3)) {   // Potential side windows
+        rn = rng(tw + 2, bw - 5);
+        ter(rw, rn    ) = st_window;
+        ter(rw, rn + 4) = st_window;
+    }
+    if (!one_in(3)) {   // Potential side windows
+        rn = rng(tw + 2, bw - 5);
+        ter(lw, rn    ) = st_window;
+        ter(lw, rn + 4) = st_window;
+    }
+    ter(rng(lw + 1, lw + 2), cw) = st_door_c;
+    if (one_in(4))
+        ter(rw - 2, cw) = st_door_c;
+    else
+        ter(mw, rng(cw + 1, bw - 1)) = st_door_c;
+    if (one_in(2)) {    // Placement of the main door
+        ter(rng(lw + 2, cw - 1), tw) = (one_in(6) ? st_door_c : st_door_locked);
+        if (one_in(5))
+            ter(rw, rng(tw + 2, cw - 2)) = (one_in(6) ? st_door_c : st_door_locked);
+    } else {
+        ter(rng(cw + 1, rw - 2), tw) = (one_in(6) ? st_door_c : st_door_locked);
+        if (one_in(5))
+            ter(lw, rng(tw + 2, cw - 2)) = (one_in(6) ? st_door_c : st_door_locked);
+    }
+
+    if (oter == overmap::ot_house_east)
+        rotate(1);
+    if (oter == overmap::ot_house_south)
+        rotate(2);
+    if (oter == overmap::ot_house_west)
+        rotate(3);
+    return true;
 }
+
+void submap::make_house_room(int x0, int y0, int x1, int y1) 
+{
+    for (int i = x0; i <= x1; i++) {
+        for (int j = y0; j <= y1; j++) {
+            ster& st = ter(i, j);
+            if (j == y0 || j == y1) {
+                st = st_wall_h;
+            } else if (i == x0 || i == x1) {
+                st = st_wall_v;
+            } else {
+                st = st_floor;
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -29,6 +29,15 @@ public:
         st_pavement,
         st_pavement_y,
 
+        st_floor,
+        st_wall_h,
+        st_wall_v,
+
+        st_door_c,
+        st_door_o,
+        st_door_locked,
+
+        st_window,
 
         ///////////////////
 
@@ -79,8 +88,24 @@ private:
     bool gen_river(const overmap::oter& oter, map* mp);
     bool gen_road(const overmap::oter& oter, map* mp);
     bool gen_house(const overmap::oter& oter, map* mp);
+    void make_house_room(int x0, int y0, int x1, int y1);
+
     ster_id grass_or_dirt();
 
     void rotate(int turns, int z = 0);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

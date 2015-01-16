@@ -70,6 +70,8 @@ void overmap::load()
 
 void overmap::generate(overmap* north, overmap* west, overmap* south, overmap* east)
 {
+    srand(loc.x * 65536 + loc.y);
+
     generate_rivers(north, west, south, east);
     place_cities();
     generate_roads(north, west, south, east);

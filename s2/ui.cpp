@@ -138,13 +138,15 @@ int ui::run()
     int x = 570;
     int y = -147;
     int z = 0;
-    for (int j = 0; j != y; j--) {
-        for (int i = 0; i != x; i++) {
-            point   pt(i, j);
-            pt = map::x2sm(pt);
-            g.m().get_overmap(pt.x, pt.y);
-        }
-    }
+    // for (int j = 0; j != y; j--) {
+    //     for (int i = 0; i != x; i++) {
+    //         point   pt(i, j);
+    //         pt = map::x2sm(pt);
+    //         g.m().get_overmap(pt.x, pt.y);
+    //     }
+    // }
+    x = 1667;
+    y = 517;
     while (input != 'q') {
         draw_map(g, x, y, z);
         draw_overmap(g, x, y, z);
@@ -266,7 +268,29 @@ void ui::draw_map(game& g, int x, int y, int z)
             } else if (s == submap::st_tree_apple) {
                 ch = 'T';
                 color = c_red;
+            } else if (s == submap::st_wall_h) {
+                ch = LINE_OXOX;
+                color = c_white;
+            } else if (s == submap::st_wall_v) {
+                ch = LINE_XOXO;
+                color = c_white;
+            } else if (s == submap::st_floor) {
+                ch = '.';
+                color = c_cyan;
+            } else if (s == submap::st_door_c) {
+                ch = '+';
+                color = c_brown;
+            } else if (s == submap::st_door_o) {
+                ch = '+';
+                color = c_brown;
+            } else if (s == submap::st_door_o) {
+                ch = '+';
+                color = c_brown;
+            } else if (s == submap::st_window) {
+                ch = '"';
+                color = c_blue;
             }
+
             attron(color);
             mvaddch(cy, cx, ch);
             attroff(color);
@@ -353,7 +377,7 @@ void ui::draw_overmap(game& g, int x, int y, int z)
 
 
 void ui::init_colors()
-{
+{/*{{{*/
     start_color();
 
 #define HILIGHT COLOR_BLUE
@@ -394,6 +418,6 @@ void ui::init_colors()
     init_pair(29, COLOR_YELLOW,  COLOR_RED);
 
     init_pair(30, COLOR_BLACK,   COLOR_BLACK  );
-}
+}/*}}}*/
 
 

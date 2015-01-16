@@ -57,7 +57,7 @@ public:
         ot_road_es,
         ot_road_sw,
         ot_road_wn,
-        ot_road_nes,
+        ot_road_nes,    // 30
         ot_road_new,
         ot_road_nsw,
         ot_road_esw,
@@ -71,7 +71,7 @@ public:
         ot_building_start,
 
         ot_house_north,
-        ot_house_east,
+        ot_house_east,      // 40
         ot_house_south,
         ot_house_west,
 
