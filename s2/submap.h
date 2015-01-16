@@ -25,6 +25,13 @@ public:
         st_water_sh,
         st_water_dp,
 
+        st_sidewalk,
+        st_pavement,
+        st_pavement_y,
+
+
+        ///////////////////
+
         st_field,
 
         st_rock,
@@ -70,6 +77,8 @@ private:
     bool gen_field(const overmap::oter& oter, map* mp);
     bool gen_forest(const overmap::oter& oter, map* mp);
     bool gen_river(const overmap::oter& oter, map* mp);
+    bool gen_road(const overmap::oter& oter, map* mp);
+    ster_id grass_or_dirt();
 
     void rotate(int turns, int z = 0);
 };

@@ -5,6 +5,8 @@
 #include "rng.h"
 #include "map.h"
 
+#include "tools/logging.h"
+
 submap::submap(map* mp, int x, int y)
     : loc(x, y)
 {
@@ -30,6 +32,7 @@ void submap::generate(map* mp)
     if (gen_forest(oter, mp)) return;
     if (gen_field(oter, mp)) return;
     if (gen_river(oter, mp)) return;
+    if (gen_road(oter, mp)) return;
 
     // rock
     // road
@@ -78,13 +81,13 @@ void submap::rotate(int turns, int z)
 }/*}}}*/
 
 void submap::gen_full(ster_id id)
-{
+{/*{{{*/
     for (int j = 0; j < SMAPY; j++) {
         for (int i = 0; i < SMAPX; i++) {
             ter(i, j) = id;
         }
     }
-}
+}/*}}}*/
 
 bool submap::gen_field(const overmap::oter& oter, map* mp)
 {/*{{{*/
@@ -94,7 +97,7 @@ bool submap::gen_field(const overmap::oter& oter, map* mp)
     for (int j = 0; j < SMAPY; j++) {
         for (int i = 0; i < SMAPX; i++) {
             ster& st = ter(i, j);
-            st = one_in(4) ? st_grass : st_dirt;
+            st = grass_or_dirt();
 
             if (one_in(120)) {
                 if (one_in(30)) {
@@ -162,7 +165,7 @@ bool submap::gen_forest(const overmap::oter& oter, map* mp)
             } else if (rn >= 10) {
                 st = st_tree_young;
             } else {
-                st = st_dirt;
+                st = grass_or_dirt();
             }
         }
     }
@@ -238,6 +241,117 @@ bool submap::gen_river(const overmap::oter& oter, map* mp)
     }
     return true;
 }/*}}}*/
+
+submap::ster_id submap::grass_or_dirt()
+{
+    return one_in(4) ? st_grass : st_dirt;
+}
+
+bool submap::gen_road(const overmap::oter& oter, map* mp)
+{
+    if (!oter.is_road())
+        return false;
+
+    bool n = mp->get_oter(loc.x, loc.y - 1).is_building();
+    bool s = mp->get_oter(loc.x, loc.y + 1).is_building();
+    bool w = mp->get_oter(loc.x - 1, loc.y).is_building();
+    bool e = mp->get_oter(loc.x + 1, loc.y).is_building();
+    bool bb = n || s || w || e;
+
+    switch (oter.type) {
+    case overmap::ot_road_ns:
+    case overmap::ot_road_ew:
+        for (int i = 0; i < SMAPX; i++) {
+            for (int j = 0; j < SMAPY; j++) {
+                if (i < 4 || i >= SMAPX- 4) {
+                    ter(i, j) = bb ? st_sidewalk : grass_or_dirt();
+                } else {
+                    if ((i == SMAPX / 2 || i == SMAPX / 2 - 1) && j % 4 != 0)
+                        ter(i, j) = st_pavement_y;
+                    else
+                        ter(i, j) = st_pavement;
+                }
+            }
+        }
+        if (oter == overmap::ot_road_ew)
+            rotate(1);
+        break;
+    case overmap::ot_road_ne:
+    case overmap::ot_road_es:
+    case overmap::ot_road_sw:
+    case overmap::ot_road_wn:
+        for (int i = 0; i < SMAPX; i++) {
+            for (int j = 0; j < SMAPY; j++) {
+                if ((i >= SMAPX - 4 && j < 4) || i < 4 || j >= SMAPY - 4) {
+                    ter(i, j) = bb ? st_sidewalk : grass_or_dirt();
+                } else {
+                    if (((i == SMAPX / 2 - 1 || i == SMAPX / 2) && j % 4 != 0 && j < SMAPY / 2 - 1) 
+                        || ((j == SMAPY / 2 - 1 || j == SMAPY / 2) && i % 4 != 0 && i > SMAPX / 2))
+                        ter(i, j) = st_pavement_y;
+                    else
+                        ter(i, j) = st_pavement;
+                }
+            }
+        }
+        if (oter == overmap::ot_road_es)
+            rotate(1);
+        if (oter == overmap::ot_road_sw)
+            rotate(2);
+        if (oter == overmap::ot_road_wn)
+            rotate(3);
+
+    case overmap::ot_road_nes:
+    case overmap::ot_road_new:
+    case overmap::ot_road_nsw:
+    case overmap::ot_road_esw:
+        for (int i = 0; i < SMAPX; i++) {
+            for (int j = 0; j < SMAPY; j++) {
+                if (i < 4 || (i >= SMAPX - 4 && (j < 4 || j >= SMAPY - 4))) {
+                    ter(i, j) = bb ? st_sidewalk : grass_or_dirt();
+                } else {
+                    if (((i == SMAPX / 2 - 1 || i == SMAPX / 2) && j % 4 != 0) ||
+                        ((j == SMAPY / 2 - 1 || j == SMAPY) && i % 4 != 0 && i > SMAPX / 2))
+                        ter(i, j) = st_pavement_y;
+                    else
+                        ter(i, j) = st_pavement;
+                }
+            }
+        }
+        if (oter == overmap::ot_road_esw)
+            rotate(1);
+        if (oter == overmap::ot_road_nsw)
+            rotate(2);
+        if (oter == overmap::ot_road_new)
+            rotate(3);
+        break;
+    case overmap::ot_road_nesw:
+        n = mp->get_oter(loc.x, loc.y - 1) == overmap::ot_road_nesw;
+        s = mp->get_oter(loc.x, loc.y + 1) == overmap::ot_road_nesw;
+        w = mp->get_oter(loc.x - 1, loc.y) == overmap::ot_road_nesw;
+        e = mp->get_oter(loc.x + 1, loc.y) == overmap::ot_road_nesw;
+        bb = n && s && w && e;
+
+        for (int i = 0; i < SMAPX; i++) {
+            for (int j = 0; j < SMAPY; j++) {
+                if (bb)
+                    ter(i, j) = st_sidewalk;
+                else if ((i < 4 || i >= SMAPX - 4) && (j < 4 || j >= SMAPY - 4)) {
+                    ter(i, j) = bb ? grass_or_dirt() : st_sidewalk;
+                } else {
+                    if (((i == SMAPX / 2 - 1 || i == SMAPX / 2) && j % 4 != 0) ||
+                        ((j == SMAPY / 2 - 1 || j == SMAPY / 2) && i % 4 != 0))
+                        ter(i, j) = st_pavement_y;
+                    else
+                        ter(i, j) = st_pavement;
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
+    return true;
+}
 
 
 

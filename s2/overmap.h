@@ -101,12 +101,12 @@ public:
         bool operator<=(oter_id t) const { return operator<(t) || operator==(t); }
         bool operator>(oter_id t) const { return !operator<=(t); }
 
-        bool is_river() { return (type > ot_river_start && type <= ot_river_end) || type == ot_bridge_ns || type == ot_bridge_ew; }
-        bool is_water() { return (type > ot_river_start && type <= ot_river_end) || type == ot_forest_water; }
-        bool is_road() { return type > ot_road_start && type <= ot_road_end; }
-        bool is_bridge() { return type == ot_bridge_ns || type == ot_bridge_ew; }
-        bool is_building() { return type > ot_building_start && type <= ot_building_end; }
-        bool is_forest() { return type >= ot_forest && type <= ot_forest_water; }
+        bool is_river() const { return (type > ot_river_start && type <= ot_river_end) || type == ot_bridge_ns || type == ot_bridge_ew; }
+        bool is_water() const { return (type > ot_river_start && type <= ot_river_end) || type == ot_forest_water; }
+        bool is_road() const { return type > ot_road_start && type <= ot_road_end; }
+        bool is_bridge() const { return type == ot_bridge_ns || type == ot_bridge_ew; }
+        bool is_building() const { return type > ot_building_start && type <= ot_building_end; }
+        bool is_forest() const { return type >= ot_forest && type <= ot_forest_water; }
     };
 
 
