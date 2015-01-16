@@ -236,10 +236,10 @@ void ui::draw_map(game& g, int x, int y, int z)
                 color = c_blue;
             } else if (s == submap::st_sidewalk) {
                 ch = '.';
-                color = c_white;
+                color = c_ltgray;
             } else if (s == submap::st_pavement) {
                 ch = '.';
-                color = c_ltgray;
+                color = c_dkgray;
             } else if (s == submap::st_pavement_y) {
                 ch = '.';
                 color = c_yellow;

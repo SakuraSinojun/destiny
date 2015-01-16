@@ -33,9 +33,9 @@ void submap::generate(map* mp)
     if (gen_field(oter, mp)) return;
     if (gen_river(oter, mp)) return;
     if (gen_road(oter, mp)) return;
+    if (gen_house(oter, mp)) return;
 
     // rock
-    // road
     // house
 }
 
@@ -248,7 +248,7 @@ submap::ster_id submap::grass_or_dirt()
 }
 
 bool submap::gen_road(const overmap::oter& oter, map* mp)
-{
+{/*{{{*/
     if (!oter.is_road())
         return false;
 
@@ -351,9 +351,12 @@ bool submap::gen_road(const overmap::oter& oter, map* mp)
         break;
     }
     return true;
+}/*}}}*/
+
+bool submap::gen_house(const overmap::oter& oter, map* mp)
+{
+    return false;
 }
-
-
 
 
 

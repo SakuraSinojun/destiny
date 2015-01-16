@@ -769,6 +769,26 @@ void overmap::polish(int z, oter_id min, oter_id max)
             }
         }
     }
+
+    for (int y = 0; y < OMAPY - 1; y++) {
+        for (int x = 0; x < OMAPX - 1; x++) {
+            if (ter(x, y, z) >= min && ter(x, y, z) <= max) {
+                if (ter(x, y, z) == ot_road_nes && ter(x + 1, y, z) == ot_road_nsw 
+                    /* && ter(x, y + 1, z) == ot_road_nes && ter(x + 1, y + 1, z) == ot_road_nsw */ ) {
+                    ter(x, y, z) = ot_road_ns;
+                    ter(x + 1, y, z) = ot_road_ns;
+                    // ter(x, y + 1, z) = ot_road_ns;
+                    // ter(x + 1, y + 1, z) = ot_road_ns;
+                } else if (ter(x, y, z) == ot_road_esw && ter(x, y + 1, z) == ot_road_new
+                    /* && ter(x + 1, y, z) == ot_road_esw && ter(x + 1, y + 1, z) == ot_road_new */ ) {
+                    ter(x, y, z) = ot_road_ew;
+                    ter(x, y + 1, z) = ot_road_ew;
+                    // ter(x + 1, y, z) = ot_road_ew;
+                    // ter(x + 1, y + 1, z) = ot_road_ew;
+                }
+            }
+        }
+    }
 }
 
 void overmap::good_road(int x, int y, int z)
