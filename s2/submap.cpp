@@ -370,16 +370,14 @@ bool submap::gen_road(const overmap::oter& oter, map* mp)
 
 bool submap::gen_house(const overmap::oter& oter, map* mp)
 {
-    RUN_HERE() << "oter = " << oter.type;
     if (oter != overmap::ot_house_north 
         && oter != overmap::ot_house_east
         && oter != overmap::ot_house_south
         && oter != overmap::ot_house_west) {
         return false;
     }
-    RUN_HERE();
 
-    int lw = rng(0, 4);         // West external wall
+    int lw = rng(1, 4);         // West external wall
     int mw = lw + rng(7, 10);   // Middle wall between bedroom & kitchen/bath
     int rw = SMAPX - rng(1, 5); // East external wall
     int tw = rng(1, 6);         // North external wall
@@ -389,6 +387,7 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
     // ster_id wh = (oter == overmap::ot_house_north || oter == overmap::ot_house_south) ? st_wall_h : st_wall_v;
     // ster_id wv = (oter == overmap::ot_house_north || oter == overmap::ot_house_south) ? st_wall_v : st_wall_h;
 
+    // 外墙
     for (int i = 0; i < SMAPX; i++) {
         for (int j = 0; j < SMAPY; j++) {
             if (i > lw && i < rw && j > tw && j < bw)
@@ -402,54 +401,68 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
         }
     }
 
+    // 上面的房间分成两份
+    {
+        mw = rng(lw + 5, rw - 5);
+        cw = rng(tw + 5, bw - 5); // tw + rng(4, 7);
+        make_house_room(mw, tw, rw, cw);
+        make_house_room(lw, tw, mw, cw);
 
-    mw = rng(lw + 5, rw - 5);
-    cw = tw + rng(4, 7);
-    make_house_room(mw, tw, rw, cw);
-    make_house_room(lw, tw, mw, cw);
-    ter(mw, rng(tw + 2, cw - 2)) = (one_in(3) ? st_door_c : st_floor);
+        // 开个门
+        ter(mw, rng(tw + 2, cw - 2)) = st_door_c; // (one_in(3) ? st_door_c : st_floor);
 
-    int rn = rng(lw + 2, cw - 3);
-    ter(rn    , tw) = st_window;
-    ter(rn + 1, tw) = st_window;
-    rn = rng(cw + 2, rw - 3);
-    ter(rn    , tw) = st_window;
-    ter(rn + 1, tw) = st_window;
+        // 上面两个房间各开一到两个窗子
+        int rn = rng(lw + 2, mw - 3);
+        ter(rn    , tw) = st_window;
+        if (one_in(2))
+            ter(rn + 1, tw) = st_window;
+        rn = rng(mw + 2, rw - 3);
+        ter(rn    , tw) = st_window;
+        if (one_in(2))
+            ter(rn + 1, tw) = st_window;
+    }
+
+    // 下面的房间
     mw = rng(lw + 3, rw - 3);
-    if (mw <= lw + 5) { // Bedroom on right, bathroom on left
-        rn = rng(cw + 2, rw - 2);
+    // int rn;
+    // 左边房间小右边房间大
+    if (mw <= (lw + rw) / 2) {
+        // rn = rng(cw + 2, rw - 2);
         if (bw - cw >= 10 && mw - lw >= 6) {
-            make_house_room(lw, bw - 5, mw, bw);
-            make_house_room(lw, cw, mw, bw - 5);
+            make_house_room(lw, bw - 4, mw, bw);
+            make_house_room(lw, cw, mw, bw - 4);
             ter(mw - 1, cw) = st_door_c;
         } else {
-            if (bw - cw > 4) {	// Too big for a bathroom, not big enough for 2nd bedrm
+            if (bw - cw > 5) {
                 make_house_room(lw, bw - 4, mw, bw);
-                for (int i = lw + 1; i <= mw - 1; i++)
-                    ter(i, cw) = st_floor;
-            } else
-                make_house_room(lw, cw, mw, bw);
-        }
-        make_house_room(mw, cw, rw, bw);
-        ter(mw, rng(bw - 4, bw - 1)) = st_door_c;
-    } else {    // Bedroom on left, bathroom on right
-        rn = rng(lw + 2, cw - 2);
-        if (bw - cw >= 10 && rw - mw >= 6) {
-            make_house_room(mw, bw - 5, rw, bw);
-            make_house_room(mw, cw, rw, bw - 5);
-            ter(rw - 1, cw) = st_door_c;
-        } else {
-            if (bw - cw > 4) {	// Too big for a bathroom, not big enough for 2nd bedrm
-                make_house_room(mw, bw - 4, rw, bw);
-                for (int i = mw + 1; i <= rw - 1; i++)
-                    ter(i, cw) = st_floor;
+                // make_house_room(lw, cw, mw, bw - 4);
+                // for (int i = lw + 1; i <= mw - 1; i++)
+                //     ter(i, cw) = st_floor;
             } else {
-                make_house_room(mw, cw, rw, bw);
+                make_house_room(lw, cw, mw, bw);
             }
         }
-        make_house_room(lw, cw, mw, bw);
-        ter(mw, rng(bw - 4, bw - 1)) = st_door_c;
+        // make_house_room(mw, cw, rw, bw);
+        // ter(mw, rng(bw - 4, bw - 1)) = st_door_c;
+    } else {    // Bedroom on left, bathroom on right
+//         // rn = rng(lw + 2, cw - 2);
+//         if (bw - cw >= 10 && rw - mw >= 6) {
+//             make_house_room(mw, bw - 5, rw, bw);
+//             make_house_room(mw, cw, rw, bw - 5);
+//             ter(rw - 1, cw) = st_door_c;
+//         } else {
+//             if (bw - cw > 4) {	// Too big for a bathroom, not big enough for 2nd bedrm
+//                 make_house_room(mw, bw - 4, rw, bw);
+//                 for (int i = mw + 1; i <= rw - 1; i++)
+//                     ter(i, cw) = st_floor;
+//             } else {
+//                 make_house_room(mw, cw, rw, bw);
+//             }
+//         }
+//         make_house_room(lw, cw, mw, bw);
+//         ter(mw, rng(bw - 4, bw - 1)) = st_door_c;
     }
+#if 0
     ter(rn    , bw) = st_window;
     ter(rn + 1, bw) = st_window;
     if (!one_in(3)) {   // Potential side windows
@@ -476,13 +489,15 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
         if (one_in(5))
             ter(lw, rng(tw + 2, cw - 2)) = (one_in(6) ? st_door_c : st_door_locked);
     }
-
+#endif
+#if 0
     if (oter == overmap::ot_house_east)
         rotate(1);
     if (oter == overmap::ot_house_south)
         rotate(2);
     if (oter == overmap::ot_house_west)
         rotate(3);
+#endif
     return true;
 }
 
