@@ -268,11 +268,19 @@ void ui::draw_map(game& g, int x, int y, int z)
             } else if (s == submap::st_tree_apple) {
                 ch = 'T';
                 color = c_red;
+#if 0
+            } else if (s == submap::st_wall_h) {
+                ch = LINE_OXOX;
+                color = c_white;
+            } else if (s == submap::st_wall_v) {
+                ch = LINE_XOXO;
+                color = c_white;
+#endif
             } else if (s == submap::st_wall_h || s == submap::st_wall_v) {
-                bool t = g.m().get_ster(i, j - 1, z).is_wall();
-                bool b = g.m().get_ster(i, j + 1, z).is_wall();
-                bool l = g.m().get_ster(i - 1, j, z).is_wall();
-                bool r = g.m().get_ster(i + 1, j, z).is_wall();
+                bool t = g.m().get_ster(i, j - 1, z).is_wall_or_door();
+                bool b = g.m().get_ster(i, j + 1, z).is_wall_or_door();
+                bool l = g.m().get_ster(i - 1, j, z).is_wall_or_door();
+                bool r = g.m().get_ster(i + 1, j, z).is_wall_or_door();
                 if (t && b && l && r)
                     ch = LINE_XXXX;
                 else if (t && b && l)
