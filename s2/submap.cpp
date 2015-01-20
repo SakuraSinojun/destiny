@@ -409,10 +409,10 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
     make_house_room(lw, tw, mw, cw);
     ter(mw, rng(tw + 2, cw - 2)) = (one_in(3) ? st_door_c : st_floor);
 
-    int rn = rng(lw + 1, cw - 2);
+    int rn = rng(lw + 2, cw - 3);
     ter(rn    , tw) = st_window;
     ter(rn + 1, tw) = st_window;
-    rn = rng(cw + 1, rw - 2);
+    rn = rng(cw + 2, rw - 3);
     ter(rn    , tw) = st_window;
     ter(rn + 1, tw) = st_window;
     mw = rng(lw + 3, rw - 3);

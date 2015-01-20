@@ -61,6 +61,8 @@ public:
         bool operator>=(ster_id t) { return !operator<(t); }
         bool operator<=(ster_id t) { return operator<(t) || operator==(t); }
         bool operator>(ster_id t) { return !operator<=(t); }
+
+        bool is_wall() const { return (type == st_wall_h || type == st_wall_v); }
     };
     
     class map_layer {
