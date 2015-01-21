@@ -94,7 +94,8 @@ private:
     bool gen_road(const overmap::oter& oter, map* mp);
     bool gen_house(const overmap::oter& oter, map* mp);
 
-    void gen_house_flat();
+    void gen_house_style1();
+    void gen_house_style2();
 
     void make_house_room(int x0, int y0, int x1, int y1);
 
