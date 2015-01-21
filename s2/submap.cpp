@@ -382,7 +382,7 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
             ter(i, j) = grass_or_dirt();
         }
     }
-    gen_house_style2();
+    gen_house_style3();
 
 #if 0
     if (oter == overmap::ot_house_east)
@@ -426,7 +426,7 @@ void submap::gen_house_style1()
         make_house_room(lw, tw, mw, cw);
 
         // 中间开个门
-        ter(mw, rng(tw + 2, cw - 2)) = st_door_c;
+        make_door(mw, rng(tw + 2, cw - 2));
 
         // 上面两个房间各开一到两个窗子
         int rn = rng(lw + 2, mw - 3);
@@ -449,33 +449,33 @@ void submap::gen_house_style1()
         if (bw - cw >= 10 && mw - lw >= 6) {
             make_house_room(lw, bw - 4, mw, bw);
             make_house_room(lw, cw, mw, bw - 4);
-            ter(rng(lw + 1, mw - 1), cw) = st_door_c;
-            ter(rng(mw1 + 1, rw - 1), cw) = st_door_c;
-            ter(mw, rng(bw - 3, bw - 1)) = st_door_c;
-            ter(rng(lw + 1, mw - 1), bw - 4) = st_door_c;
+            make_door(rng(lw + 1, mw - 1), cw);
+            make_door(rng(mw1 + 1, rw - 1), cw);
+            make_door(mw, rng(bw - 3, bw - 1));
+            make_door(rng(lw + 1, mw - 1), bw - 4);
         } else {
             make_house_room(lw, cw, mw, bw);
             int m = (mw > mw1) ? mw1 : mw;
             for (int i = lw + 1; i <= m - 1; i++)
                 ter(i, cw) = st_floor;
-            ter(mw, rng(cw + 1, bw - 1)) = st_door_c;
+            make_door(mw, rng(cw + 1, bw - 1));
         }
     } else {
         rn = rng(lw + 2, mw - 2);
         if (bw - cw >= 10 && rw - mw >= 6) {
             make_house_room(mw, bw - 4, rw, bw);
             make_house_room(mw, cw, rw, bw - 4);
-            ter(rng(mw + 1, rw - 1), cw) = st_door_c;
-            ter(rng(lw + 1, mw1 - 1), cw) = st_door_c;
-            ter(mw, rng(bw - 3, bw - 1)) = st_door_c;
-            ter(rng(mw + 1, rw - 1), bw - 4) = st_door_c;
+            make_door(rng(mw + 1, rw - 1), cw);
+            make_door(rng(lw + 1, mw1 - 1), cw);
+            make_door(mw, rng(bw - 3, bw - 1));
+            make_door(rng(mw + 1, rw - 1), bw - 4);
         } else {
             make_house_room(mw, cw, rw, bw);
             int m = (mw > mw1) ? mw : mw1;
             for (int i = m + 1; i < rw; i++) {
                 ter(i, cw) = st_floor;
             }
-            ter(mw, rng(cw + 1, bw - 1)) = st_door_c;
+            make_door(mw, rng(cw + 1, bw - 1));
         }
     }
     ter(rn    , bw) = st_window;
@@ -495,29 +495,29 @@ void submap::gen_house_style1()
         int x = rng(lw + 2, mw1 - 1);
         ter(x - 1, tw) = st_wall_h;
         ter(x + 1, tw) = st_wall_h;
-        ter(x, tw) = (one_in(6) ? st_door_c : st_door_locked);
+        make_door(x, tw, true);
         if (one_in(5)) {
             int y = rng(tw + 2, cw - 2);
             ter(rw, y - 1) = st_wall_v;
             ter(rw, y + 1) = st_wall_v;
-            ter(rw, y) = (one_in(6) ? st_door_c : st_door_locked);
+            make_door(rw, y, true);
         }
     } else {
         int x = rng(lw + 2, mw1 - 1);
         ter(x - 1, tw) = st_wall_h;
-        ter(x, tw) = (one_in(6) ? st_door_c : st_door_locked);
         ter(x + 1, tw) = st_wall_h;
+        make_door(x, tw, true);
         if (one_in(5)) {
             int y = rng(tw + 2, cw - 2);
             ter(lw, y - 1) = st_wall_v;
             ter(lw, y + 1) = st_wall_v;
-            ter(lw, y) = (one_in(6) ? st_door_c : st_door_locked);
+            make_door(lw, y, true);
         }
     }
 }/*}}}*/
 
 void submap::gen_house_style2()
-{
+{/*{{{*/
     int lw = rng(2, 4);
     int rw = SMAPX - rng(2, 5);
     int tw = rng(2, 4);
@@ -542,10 +542,10 @@ void submap::gen_house_style2()
         make_house_room(cw1, mw1, cw2, mw2);
     }
 
-    ter(rng(cw1 + 1, cw2 - 1), mw1) = st_door_c;
-    ter(rng(cw1 + 1, cw2 - 1), mw2) = st_door_c;
-    ter(cw1, rng(mw1 + 1, mw2 - 1)) = st_door_c;
-    ter(cw2, rng(mw1 + 1, mw2 - 1)) = st_door_c;
+    make_door(rng(cw1 + 1, cw2 - 1), mw1);
+    make_door(rng(cw1 + 1, cw2 - 1), mw2);
+    make_door(cw1, rng(mw1 + 1, mw2 - 1));
+    make_door(cw2, rng(mw1 + 1, mw2 - 1));
 
     // 随机砍掉一堵墙。
     mw = rng(0, 4);
@@ -567,8 +567,38 @@ void submap::gen_house_style2()
     cw = rng(lw + 2, rw - 2);
     if (cw == cw1 || cw == cw2)
         cw++;
-    ter(cw, tw) = st_door_c;
-}
+    make_door(cw, tw);
+}/*}}}*/
+
+void submap::gen_house_style3()
+{/*{{{*/
+    int lw = rng(2, 4);
+    int rw = SMAPX - rng(2, 5);
+    int tw = rng(2, 4);
+    int bw = SMAPY - rng(2, 5);
+    make_house_room(lw, tw, rw, bw);
+
+
+    int cw = rng(4, 6);
+    int cw1 = rng(lw + 4, rw - 4 - cw);
+    int cw2 = cw1 + cw;
+
+    int mw1 = rng(tw + 3, tw + 5);
+    int mw2 = rng(mw1 + 2, bw - 4);
+    int mw3 = rng(mw1 + 2, bw - 4);
+
+    make_house_room(lw, tw, cw1, mw2);
+    make_house_room(cw1, tw, cw2, mw1);
+    make_house_room(cw2, tw, rw, mw3);
+    make_house_room(cw1, mw1, cw2, bw);
+
+    make_door(rng(cw1 + 1, cw2 - 1), mw1);
+    make_door(cw1, rng(mw1 + 1, mw2 - 1));
+    make_door(cw1, rng(mw2 + 1, bw  - 1));
+    make_door(cw2, rng(mw1 + 1, mw3 - 1));
+    make_door(cw2, rng(mw3 + 1, bw  - 1));
+    make_door(rng(cw1 + 1, cw2 - 1), bw);
+}/*}}}*/
 
 void submap::make_house_room(int x0, int y0, int x1, int y1) 
 {
@@ -586,6 +616,10 @@ void submap::make_house_room(int x0, int y0, int x1, int y1)
     }
 }
 
+void submap::make_door(int x, int y, bool maylock)
+{
+    ter(x, y) = maylock ? (one_in(6) ? st_door_c : st_door_locked) : st_door_c;
+}
 
 
 

@@ -96,8 +96,10 @@ private:
 
     void gen_house_style1();
     void gen_house_style2();
+    void gen_house_style3();
 
     void make_house_room(int x0, int y0, int x1, int y1);
+    void make_door(int x, int y, bool maylock = false);
 
     ster_id grass_or_dirt();
 
