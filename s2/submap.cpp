@@ -377,6 +377,21 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
         return false;
     }
 
+    gen_house_flat();
+
+#if 0
+    if (oter == overmap::ot_house_east)
+        rotate(1);
+    if (oter == overmap::ot_house_south)
+        rotate(2);
+    if (oter == overmap::ot_house_west)
+        rotate(3);
+#endif
+    return true;
+}
+
+void submap::gen_house_flat()
+{
     int lw = rng(1, 4);         // West external wall
     int mw = lw + rng(7, 10);   // Middle wall between bedroom & kitchen/bath
     int rw = SMAPX - rng(1, 5); // East external wall
@@ -497,15 +512,6 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
             ter(lw, y) = (one_in(6) ? st_door_c : st_door_locked);
         }
     }
-#if 0
-    if (oter == overmap::ot_house_east)
-        rotate(1);
-    if (oter == overmap::ot_house_south)
-        rotate(2);
-    if (oter == overmap::ot_house_west)
-        rotate(3);
-#endif
-    return true;
 }
 
 void submap::make_house_room(int x0, int y0, int x1, int y1) 
