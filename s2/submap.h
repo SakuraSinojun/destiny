@@ -64,7 +64,8 @@ public:
 
         bool is_wall() const { return (type == st_wall_h || type == st_wall_v); }
         bool is_door() const { return (type == st_door_c || type == st_door_o || type == st_door_locked); }
-        bool is_wall_or_door() const { return is_wall() || is_door(); }
+        bool is_window() const { return type == st_window; }
+        bool is_wall_or_door() const { return is_wall() || is_door() || is_window(); }
     };
     
     class map_layer {

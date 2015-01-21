@@ -321,7 +321,7 @@ void ui::draw_map(game& g, int x, int y, int z)
             } else if (s == submap::st_door_o) {
                 ch = '+';
                 color = c_brown;
-            } else if (s == submap::st_door_o) {
+            } else if (s == submap::st_door_locked) {
                 ch = '+';
                 color = c_brown;
             } else if (s == submap::st_window) {
