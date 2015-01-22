@@ -65,6 +65,14 @@ submap::ster map::get_ster(int x, int y, int z)
     return m->ter(st.x, st.y, z);
 }
 
+submap* map::get_current_submap(const int x, const int y)
+{
+    point   sp = x2sm(point(x, y));
+    point   st = x2ster(point(x, y));
+    submap* m = get_submap(sp.x, sp.y);
+    return m;
+}
+
 point map::x2sm(const point& pt)
 {
     int x = pt.x, y = pt.y;

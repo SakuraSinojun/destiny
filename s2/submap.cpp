@@ -92,7 +92,6 @@ void submap::rotate(int turns, int z)
             }
         }
     }
-
 }/*}}}*/
 
 void submap::gen_full(ster_id id)
@@ -382,7 +381,7 @@ bool submap::gen_house(const overmap::oter& oter, map* mp)
             ter(i, j) = grass_or_dirt();
         }
     }
-    gen_house_style3();
+    gen_house_style4();
 
 #if 0
     if (oter == overmap::ot_house_east)
@@ -430,13 +429,13 @@ void submap::gen_house_style1()
 
         // 上面两个房间各开一到两个窗子
         int rn = rng(lw + 2, mw - 3);
-        ter(rn    , tw) = st_window;
+        make_window(rn, tw);
         if (one_in(2))
-            ter(rn + 1, tw) = st_window;
+            make_window(rn + 1, tw);
         rn = rng(mw + 2, rw - 3);
-        ter(rn    , tw) = st_window;
+        make_window(rn, tw);
         if (one_in(2))
-            ter(rn + 1, tw) = st_window;
+            make_window(rn + 1, tw);
     }
     int mw1 = mw;
 
@@ -478,17 +477,17 @@ void submap::gen_house_style1()
             make_door(mw, rng(cw + 1, bw - 1));
         }
     }
-    ter(rn    , bw) = st_window;
-    ter(rn + 1, bw) = st_window;
+    make_window(rn, bw);
+    make_window(rn + 1, bw);
     if (!one_in(3)) {
         rn = rng(tw + 2, bw - 5);
-        ter(rw, rn    ) = st_window;
-        ter(rw, rn + 4) = st_window;
+        make_window(rw, rn);
+        make_window(rw, rn + 4);
     }
     if (!one_in(3)) {
         rn = rng(tw + 2, bw - 5);
-        ter(lw, rn    ) = st_window;
-        ter(lw, rn + 4) = st_window;
+        make_window(lw, rn);
+        make_window(lw, rn + 4);
     }
 
     if (one_in(2)) {
@@ -598,6 +597,71 @@ void submap::gen_house_style3()
     make_door(cw2, rng(mw1 + 1, mw3 - 1));
     make_door(cw2, rng(mw3 + 1, bw  - 1));
     make_door(rng(cw1 + 1, cw2 - 1), bw);
+
+    rotate(2);
+}/*}}}*/
+
+void submap::gen_house_style4()
+{/*{{{*/
+    int l = rng(1, 4);
+    int r = SMAPX - rng(1, 5);
+    int t = rng(1, 4);
+    int b = SMAPY - rng(1, 5);
+    make_house_room(l, t, r, b);
+
+    int c1 = l + 2;
+    int c2 = rng(l + 6, r - 8);
+    int c3 = c2 + 3;
+    int c4 = r - 2;
+    int c5 = rng(c1 + 5, r - 5);
+    int m1 = t + 3;
+    int m4 = rng(b - 7, b - 4);
+    int m2 = rng(m1 + 2, m4 - 4);
+    int m3 = rng(m1 + 2, m4 - 4);
+
+    make_house_room(l, t, c1, b);
+    make_house_room(c1, m4, r, b);
+    make_house_room(c2, t, c3, m4);
+    make_house_room(c4, t, r, m4);
+    make_house_room(c2, t, c3, m1);
+    make_house_room(c1, t, c2, m2);
+    make_house_room(c3, t, c4, m3);
+    make_house_room(c1, m4, c5, b);
+
+    int x = rng(c1 + 2, r - 2);
+    if (x == c5)
+        x++;
+    make_door(x, b, true);
+    ter(c5, m4 + 1) = st_floor;
+    ter(c5, m4 + 2) = st_floor;
+
+    make_door(c1, rng(m4 + 1, b - 1));
+    make_door(rng(c2 + 1, c3 - 1), m4);
+    make_door(rng(c2 + 1, c3 - 1), m1);
+    make_door(c2, rng(m1 + 1, m2 - 1));
+    make_door(c3, rng(m1 + 1, m3 - 1));
+    make_door(c2, rng(m2 + 1, m4 - 1));
+    make_door(c3, rng(m3 + 1, m4 - 1));
+    make_door(c4 + 1, m4);
+
+    for (int y = t + 1; y < b - 1; y += 3) {
+        make_window(l, y);
+        make_window(l, y + 1);
+    }
+    for (int y = t + 1; y < m4 - 1; y += 3) {
+        make_window(r, y);
+        make_window(r, y + 1);
+    }
+    if (one_in(3)) {
+        make_window(rng(c1 + 1, c2 - 1), t);
+    }
+    if (one_in(3)) {
+        make_window(rng(c3 + 1, c4 - 1), t);
+    }
+    if (one_in(3)) {
+        make_window(rng(c2 + 1, c2 - 1), t);
+    }
+    rotate(2);
 }/*}}}*/
 
 void submap::make_house_room(int x0, int y0, int x1, int y1) 
@@ -621,6 +685,10 @@ void submap::make_door(int x, int y, bool maylock)
     ter(x, y) = maylock ? (one_in(6) ? st_door_c : st_door_locked) : st_door_c;
 }
 
+void submap::make_window(int x, int y)
+{
+    ter(x, y) = st_window;
+}
 
 
 

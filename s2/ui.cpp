@@ -175,6 +175,10 @@ int ui::run()
             z++;
         if (input == '<')
             z--;
+        if (input == 'r') {
+            submap* m = g.m().get_current_submap(x, y);
+            m->rotate(1);
+        }
     }
 
     uninit();

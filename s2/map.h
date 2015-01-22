@@ -28,6 +28,9 @@ public:
     int get_overmap_list_size() { return overmap_list.size(); }
     int get_submap_list_size() { return submap_list.size(); }
 
+    // for rotate test.
+    submap*  get_current_submap(const int standx, const int standy);
+
 private:
     std::list<overmap>  overmap_list;
     std::list<submap>   submap_list;
